@@ -3,3 +3,8 @@
 //
 
 #include "Camera.hpp"
+
+void Camera::updateVecs()
+{
+
+}

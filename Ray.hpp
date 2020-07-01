@@ -12,10 +12,10 @@ class Ray
 {
 private:
     glm::vec3 a;
-    glm::vec3 position;
+    glm::vec3 direction;
 
 public:
-    Ray(glm::vec3 a, glm::vec3 b) : a(a), position(b)
+    Ray(glm::vec3 a, glm::vec3 b) : a(a), direction(b)
     {};
 
     glm::vec3 getA()
@@ -23,14 +23,14 @@ public:
         return a;
     }
 
-    glm::vec3 getB()
+    glm::vec3 getDirection()
     {
-        return position;
+        return direction;
     }
 
     glm::vec3 getPointAt(float t)
     {
-        return a + (position * t);
+        return a + (direction * t);
     }
 };
 
