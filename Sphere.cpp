@@ -23,8 +23,9 @@ bool Sphere::isIntersecting(Ray &r, Hit& hit, float tMin, float tMax)
         if(tMin < tempAlpha && tMax > tempAlpha)
         {
             glm::vec3 surfaceHit = r.getPointAt(tempAlpha);
-            glm::vec3 normal = (surfaceHit - position) / radius;
-            hit.color = glm::vec4(0.5f * (normal + glm::vec3(1)), 1);
+            hit.alpha = tempAlpha;
+            hit.normal = (surfaceHit - position) / radius;
+            hit.color = glm::vec4(0.5f * (hit.normal + glm::vec3(1)), 1);
 
             return true;
         }
@@ -34,13 +35,13 @@ bool Sphere::isIntersecting(Ray &r, Hit& hit, float tMin, float tMax)
         if(tMin < tempAlpha && tMax > tempAlpha)
         {
             glm::vec3 surfaceHit = r.getPointAt(tempAlpha);
-            glm::vec3 normal = (surfaceHit - position) / radius;
-            hit.color = glm::vec4(0.5f * (normal + glm::vec3(1)), 1);
+            hit.alpha = tempAlpha;
+            hit.normal = (surfaceHit - position) / radius;
+            hit.color = glm::vec4(0.5f * (hit.normal + glm::vec3(1)), 1);
 
             return true;
         }
     }
-
 
     return IHittable::isIntersecting(r, hit, tMin, tMax);
 }

@@ -38,7 +38,7 @@ glm::vec4* data;
 void pathTracing(int x, int y, int amountX, int amountY, glm::vec3& leftScreenCorner, glm::vec3& horizontal, glm::vec3& vertical,
         Camera& cam)
 {
-    Hit hit{};
+
     for (int j = y; j <  y + amountY; ++j)
     {
         for (int i = x; i <  x + amountX; ++i)
@@ -47,6 +47,7 @@ void pathTracing(int x, int y, int amountX, int amountY, glm::vec3& leftScreenCo
             float v = float(j) / (image_height-1);
 
             Ray r(cam.getPosition(), leftScreenCorner + u * horizontal + v * vertical);
+            Hit hit;
 
             bool found = false;
             for (int k = 0; k < spheres.size() && !found; ++k)
@@ -67,7 +68,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    auto windowHandle = glfwCreateWindow(image_width, image_height, "RayTracing Test", nullptr, NULL);
+    auto windowHandle = glfwCreateWindow(image_width, image_height, "RayTracing Test", nullptr, nullptr);
     glfwMakeContextCurrent(windowHandle);
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
@@ -87,9 +88,10 @@ int main() {
     auto leftScreenCorner = cam.getPosition() - (horizontal / 2.0f) - (vertical / 2.0f)
             - glm::vec3(0, 0, focalLength);
 
-    spheres.push_back(new Sphere(2.5f, glm::vec3(0, 0, -5.0f)));
+
     spheres.push_back(new Sphere(1.0f, glm::vec3(1, 0, -5.0f)));
     spheres.push_back(new Sphere(1.0f, glm::vec3(-1, 0, -5.0f)));
+    spheres.push_back(new Sphere(1.5f, glm::vec3(0, 0, -2.5f)));
 
 
     GLuint vao;
@@ -159,9 +161,9 @@ int main() {
     GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
 
     std::stringstream buf;
-    std::ifstream i("shaderRT/vs.glsl");
+    std::ifstream istream("shaderRT/vs.glsl");
 
-    buf << i.rdbuf();
+    buf << istream.rdbuf();
     auto str = buf.str();
     const char* computeCode = str.c_str();
     glShaderSource(shader, 1, &computeCode, nullptr);
@@ -172,8 +174,8 @@ int main() {
 
     if (!compiledShader)
     {
-        char infoLog[1024];
-        glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+        char infoLog[256];
+        glGetShaderInfoLog(shader, 256, NULL, infoLog);
         std::cout << infoLog << compiledShader << std::endl;
     }
 
@@ -190,14 +192,14 @@ int main() {
 
         if(glfwGetKey(windowHandle, GLFW_KEY_LEFT))
         {
-            spheres[0]->move(glm::vec3(-2, 0, 0) * 1.0f/ 60.0f);
+            spheres[0]->move(glm::vec3(-1, 0, 0) * 1.0f/ 60.0f);
         }
         else if(glfwGetKey(windowHandle, GLFW_KEY_RIGHT))
         {
-            spheres[0]->move(glm::vec3(2, 0, 0) * 1.0f/ 60.0f);
+            spheres[0]->move(glm::vec3(1, 0, 0) * 1.0f/ 60.0f);
         }
 
-        /*int t = 0;
+        int t = 0;
         for (int i = 0; i < 2; ++i)
         {
             for (int j = 0; j < 2; ++j)
@@ -211,9 +213,9 @@ int main() {
         for (int i = 0; i < 4; ++i)
         {
             threads[i].join();
-        }*/
+        }
 
-        glUseProgram(ray_program);
+       /* glUseProgram(ray_program);
 
         GLint location = glGetUniformLocation(ray_program, "camPosition");
         glUniform3f(location, cam.getPosition().x, cam.getPosition().y, cam.getPosition().z);
@@ -248,7 +250,10 @@ int main() {
 
 
         glDispatchCompute((GLuint)image_width, (GLuint)image_height, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);*/
+
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, image_width, image_height, 0, GL_RGBA, GL_FLOAT, data);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
