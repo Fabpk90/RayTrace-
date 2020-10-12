@@ -15,6 +15,8 @@
 #include <sstream>
 #include <iostream>
 
+#include "ThreadPool.hpp"
+
 
 const int image_width = 1280;
 const int image_height = 720;
@@ -35,8 +37,8 @@ const int ebos[] =
 std::vector<Sphere*> spheres;
 glm::vec4* data;
 
-void pathTracing(int x, int y, int amountX, int amountY, glm::vec3& leftScreenCorner, glm::vec3& horizontal, glm::vec3& vertical,
-        Camera& cam)
+void pathTracing(int x, int y, int amountX, int amountY, const glm::vec3& leftScreenCorner, const glm::vec3& horizontal,const glm::vec3& vertical,
+        const Camera& cam)
 {
 
     for (int j = y; j <  y + amountY; ++j)
@@ -156,7 +158,7 @@ int main() {
     int frameCount = 0;
     char* fpsCount = new char[64];
 
-    auto* threads = new std::thread[4];
+    ThreadPool threadPool;
 
     GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
 
@@ -204,16 +206,18 @@ int main() {
         {
             for (int j = 0; j < 2; ++j)
             {
-                threads[t++] = std::thread(pathTracing,
-                                         i * (image_width / 2), j * (image_height / 2), (image_width / 2), (image_height / 2),
-                                         leftScreenCorner, horizontal, vertical, cam);
+                threadPool.addJob([i, j, leftScreenCorner, horizontal, vertical, cam]()
+                {
+                    pathTracing( i * (image_width / 2), j * (image_height / 2), (image_width / 2), (image_height / 2),
+                                 leftScreenCorner, horizontal, vertical, cam);
+                });
+
             }
         }
 
-        for (int i = 0; i < 4; ++i)
-        {
-            threads[i].join();
-        }
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        shaderQuad.use();
 
        /* glUseProgram(ray_program);
 
@@ -254,10 +258,6 @@ int main() {
 
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, image_width, image_height, 0, GL_RGBA, GL_FLOAT, data);
-
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        shaderQuad.use();
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         glfwSwapBuffers(windowHandle);

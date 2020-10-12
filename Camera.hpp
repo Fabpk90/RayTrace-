@@ -22,7 +22,7 @@ public:
         updateVecs();
     }
 
-    glm::vec3 getPosition() { return position;}
+     glm::vec3 getPosition() const { return position;}
 
     void updateVecs();
 };

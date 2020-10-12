@@ -19,9 +19,12 @@
         https://glad.dav1d.de/#profile=compatibility&language=c&specification=gl&loader=on&api=gl%3D4.6
 */
 
+#if defined(_WIN32)
 #include "../../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/ucrt/stdio.h"
 #include "../../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/ucrt/stdlib.h"
 #include "../../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/ucrt/string.h"
+#endif
+
 #include "glad.h"
 
 static void* get_proc(const char *namez);
