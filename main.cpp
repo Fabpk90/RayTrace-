@@ -9,11 +9,9 @@
 #include "Sphere.hpp"
 
 #include <vector>
-#include <thread>
 
 #include <fstream>
 #include <sstream>
-#include <iostream>
 
 #include "ThreadPool.hpp"
 
@@ -65,9 +63,9 @@ void pathTracing(int x, int y, int amountX, int amountY, const glm::vec3& leftSc
 int main() {
 
     data = new glm::vec4[image_height * image_width];
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    /*glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     auto windowHandle = glfwCreateWindow(image_width, image_height, "RayTracing Test", nullptr, nullptr);
@@ -76,7 +74,7 @@ int main() {
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
-    }
+    }*/
 
     float aspectRatio = 16.0f / 9.0f;
     float viewportHeight = 2.0f;
@@ -96,7 +94,7 @@ int main() {
     spheres.push_back(new Sphere(1.5f, glm::vec3(0, 0, -2.5f)));
 
 
-    GLuint vao;
+    /*GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     GLuint vbo;
@@ -127,9 +125,9 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, image_width, image_height, 0, GL_RGBA, GL_FLOAT, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, image_width, image_height, 0, GL_RGBA, GL_FLOAT, data);*/
 
-    glBindImageTexture(0, texId, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+   /* glBindImageTexture(0, texId, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
     int work_grp_cnt[3];
 
@@ -147,20 +145,20 @@ int main() {
     glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &work_grp_size[2]);
 
     printf("max local (in one shader) work group sizes x:%i y:%i z:%i\n",
-           work_grp_size[0], work_grp_size[1], work_grp_size[2]);
+           work_grp_size[0], work_grp_size[1], work_grp_size[2]);*/
 
 
-    Shader shaderQuad = Shader("shaders/");
+   /* Shader shaderQuad = Shader("shaders/");
     shaderQuad.use();
     shaderQuad.setInt("tex", 0);
 
     double previousTime = glfwGetTime();
     int frameCount = 0;
-    char* fpsCount = new char[64];
+    char* fpsCount = new char[64];*/
 
     ThreadPool threadPool;
 
-    GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
+   /* GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
 
     std::stringstream buf;
     std::ifstream istream("shaderRT/vs.glsl");
@@ -185,9 +183,9 @@ int main() {
     glAttachShader(ray_program, shader);
     glLinkProgram(ray_program);
 
-    glUseProgram(ray_program);
+    glUseProgram(ray_program);*/
 
-    while (!glfwWindowShouldClose(windowHandle))
+    /*while (!glfwWindowShouldClose(windowHandle))
     {
         if(glfwGetKey(windowHandle, GLFW_KEY_ESCAPE))
             glfwSetWindowShouldClose(windowHandle, 1);
@@ -199,25 +197,29 @@ int main() {
         else if(glfwGetKey(windowHandle, GLFW_KEY_RIGHT))
         {
             spheres[0]->move(glm::vec3(1, 0, 0) * 1.0f/ 60.0f);
-        }
+        }*/
 
         int t = 0;
+
+    for (int n = 0; n < 10000; ++n)
+    {
         for (int i = 0; i < 2; ++i)
         {
             for (int j = 0; j < 2; ++j)
             {
                 threadPool.addJob([i, j, leftScreenCorner, horizontal, vertical, cam]()
-                {
-                    pathTracing( i * (image_width / 2), j * (image_height / 2), (image_width / 2), (image_height / 2),
-                                 leftScreenCorner, horizontal, vertical, cam);
-                });
+                                  {
+                                      pathTracing( i * (image_width / 2), j * (image_height / 2), (image_width / 2), (image_height / 2),
+                                                   leftScreenCorner, horizontal, vertical, cam);
+                                  });
 
             }
         }
+    }
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        /*glClear(GL_COLOR_BUFFER_BIT);
 
-        shaderQuad.use();
+        shaderQuad.use();*/
 
        /* glUseProgram(ray_program);
 
@@ -257,7 +259,7 @@ int main() {
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);*/
 
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, image_width, image_height, 0, GL_RGBA, GL_FLOAT, data);
+       /* glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, image_width, image_height, 0, GL_RGBA, GL_FLOAT, data);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         glfwSwapBuffers(windowHandle);
@@ -273,10 +275,12 @@ int main() {
 
             frameCount = 0;
             previousTime = currentTime;
-        }
+        }*/
 
-    }
+    //}
 
-    glfwDestroyWindow(windowHandle);
-    glfwTerminate();
+    //glfwDestroyWindow(windowHandle);
+    //glfwTerminate();
+
+    return 0;
 }

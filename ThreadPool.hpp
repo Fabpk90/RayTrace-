@@ -54,9 +54,11 @@ public:
         working = true;
         threadNum = std::thread::hardware_concurrency();
 
+        threads.reserve(threadNum);
+
         for (int i = 0; i < threadNum; ++i)
         {
-            threads.push_back(std::thread(&ThreadPool::threadLoop, this));
+            threads.emplace_back(&ThreadPool::threadLoop, this);
         }
     }
 
